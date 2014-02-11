@@ -58,9 +58,9 @@ delay = 10
 steps = int(sys.argv[1])
 
 if steps > 0:
-	print 'move right'
+	#print 'move right'
 	backwards(int(delay) / 1000.0, steps)
 else:
 	steps = 0 - steps
-	print 'move left'
+	#print 'move left'
 	forward(int(delay) / 1000.0, steps)

@@ -72,49 +72,47 @@ if [[ -n $PID ]]; then
 		DATE=$(date +%Y%m%d-%H%M%S)
 		
 		#echo "comparing files"
-		resultat=$(./BMP_Compare 11 1 &)
+		resultat=$(./BMP_Compare 11 1)
 		#resultat="0 0 0"
-		echo $resultat | while read var1 var2 var3
+		while read var1 var2 var3
 		do
 			isMove=$var1
 			movement_dir=$var2
 			movement_orig=$var3
-			#echo "isMove : $isMove"
-			if [ $isMove -eq 0 ];then
-				#echo "img identical $DATE"
-				A=10
-			else
-				
-				echo "Move dir : $movement_dir"
-				echo "Move orig : $movement_orig"
-				c=$((movement_dir + movement_orig))
-				echo "Move pos : $c"
-				echo "img different $DATE"
-				echo "$DATE" >> $FOLDER/$LOG_FILE
-				
-				cp $IMG_CMP_1 $FOLDER/IMG_$DATE.dif1.bmp &
-				cp $IMG_CMP_2 $FOLDER/IMG_$DATE.dif2.bmp &
-				
-				cp $IMG_IN $FOLDER/IMG_$DATE.jpg &
-				
-				if [ "$c" -gt 25 ]; then
-					cammove=$(($c/20))
-					echo "Cam Move : $cammove"
-					cp $IMG_MOVE $FOLDER/IMG_$DATE.move.$movement_dir.$movement_orig.bmp &
-					sudo python movecamera.py $cammove &
-					echo "Move right @ $DATE" >> $FOLDER/$LOG_FILE &
-					CameraMoved=1
-				fi
-				if [ "$c" -lt -25 ]; then
-					cammove=$(($c/20))
-					echo "Cam Move : $cammove"
-					cp $IMG_MOVE $FOLDER/IMG_$DATE.move.$movement_dir.$movement_orig.bmp &
-					sudo python movecamera.py $cammove &
-					echo "Move left @ $DATE" >> $FOLDER/$LOG_FILE &
-					CameraMoved=1
-				fi
+		done <<< "$resultat"
+		
+		if [ $isMove -eq 0 ];then
+			#echo "img identical $DATE"
+			A=10
+		else
+			echo "img different $DATE"
+			c=$((movement_dir + movement_orig))
+			echo "Move detected : from $movement_orig to $movement_dir, relatively $c"
+			echo "$DATE" >> $FOLDER/$LOG_FILE
+			
+			cp $IMG_CMP_1 $FOLDER/IMG_$DATE.dif1.bmp &
+			cp $IMG_CMP_2 $FOLDER/IMG_$DATE.dif2.bmp &
+			
+			cp $IMG_IN $FOLDER/IMG_$DATE.jpg &
+			
+			if [ "$c" -gt 25 ]; then
+				cammove=$(($c/20))
+				echo "Cam Move : $cammove to right"
+				cp $IMG_MOVE $FOLDER/IMG_$DATE.move.$movement_dir.$movement_orig.bmp &
+				sudo python movecamera.py $cammove &
+				echo "Move right @ $DATE" >> $FOLDER/$LOG_FILE &
+				CameraMoved=1
 			fi
-		done
+			if [ "$c" -lt -25 ]; then
+				cammove=$(($c/20))
+				echo "Cam Move : $cammove to left"
+				cp $IMG_MOVE $FOLDER/IMG_$DATE.move.$movement_dir.$movement_orig.bmp &
+				sudo python movecamera.py $cammove &
+				echo "Move left @ $DATE" >> $FOLDER/$LOG_FILE &
+				CameraMoved=1
+			fi
+		fi
+		
 		
 		if [ $CameraMoved -eq 1 ];
 		then
@@ -151,4 +149,4 @@ echo "ended at $DATE"
 echo "ended at $DATE" >> $FOLDER/$LOG_FILE
 
 timestamp2=$(date +%s)
-echo "duree $((timestamp2 - timestamp1))"
+echo "duration $((timestamp2 - timestamp1))"
