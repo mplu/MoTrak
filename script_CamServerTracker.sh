@@ -3,7 +3,7 @@
 OUTPUT_FILE="image.jpg"
 #OPTION="-rot 180 -q 10 -o $OUTPUT_FILE -w 300 -h 225 -s -t "
 #OPTION="-rot 180 -q 10 -o $OUTPUT_FILE -w 2400 -h 1800 -s -t "
-OPTION="-rot 180 -q 10 -o $OUTPUT_FILE -w 1200 -h 900 -s -t "
+OPTION="-rot 180 -q 10 -o $OUTPUT_FILE -w 1200 -h 896 -s -t "
 LOG_FILE="cap.log"
 TIME_FILE="time.left"
 
