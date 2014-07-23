@@ -54,7 +54,7 @@ def setStep(w1, w2, w3, w4):
   GPIO.output(coil_B_2_pin, w4)
  
 
-delay = 10
+delay = 5
 steps = int(sys.argv[1])
 
 if steps > 0:
