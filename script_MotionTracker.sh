@@ -20,11 +20,6 @@ RESOL_MINI="300x224"
 
 test -x /usr/bin/raspistill || exit 0
 
-function pause(){
-	#echo $1
-	$1 = 0
-	#read touche
-}
 
 case "$1" in
   start)
@@ -38,11 +33,10 @@ case "$1" in
 			echo "raspistill shadow process started for $(($2 * 60000)) seconds ($2 minutes)"
 			/usr/bin/raspistill $OPTION $(($2 * 60000)) &
 			./script_timer_in_min.sh $2 &
+			sleep 2
 
-			pause "démon démarré"
-		
-			echo "started at $DATE"
-			echo "started at $DATE" >> $FOLDER/$LOG_FILE
+			echo "Started at $DATE"
+			echo "Started at $DATE" >> $FOLDER/$LOG_FILE
 			#prendre la capture OLD
 			kill -USR1 $PID
 			sleep 0.3
@@ -54,7 +48,7 @@ case "$1" in
 			while [ $isRunning -eq 1 ]; do
 				#prendre la capture NEW
 				kill -USR1 $PID
-				sleep 0.2
+				sleep 0.1
 				#créer le BMP pour detection
 				gm mogrify -format bmp -size $RESOL_COMPARE $IMG_IN_JPG
 				mv $IMG_IN_BMP $IMG_2_BMP
@@ -66,21 +60,14 @@ case "$1" in
 				cp $IMG_SmallJPG $FOLDER/small
 				
 				DATE=$(date +%Y%m%d-%H%M%S)
-				
 
-				pause "fin acquisition"
-				
 				if [ $CameraMoved -eq 0 ];
 					then
-					
-					pause "debut comparaison"
-					
 					#comparing files
 					resultat=$(./ImgDiff)
-					
-					#echo "resultat $resultat"
 
-					c=$((movement_dir+0))
+					c=$((resultat+0))
+
 			
 					if [ "$c" -gt 5 ]; then
 						echo "Move detected : $c"
@@ -123,12 +110,13 @@ case "$1" in
 				else #du if [ $CameraMoved -eq 0 ];
 					CameraMoved=0
 				fi
-				pause "avant renommage"
 				rm $IMG_1_BMP
 				mv $IMG_2_BMP $IMG_1_BMP
-				pause "après renommage"
 
 			done
+			DATE=$(date +%Y%m%d-%H%M%S)
+			echo "Stopped at $DATE"
+			echo "Stopped at $DATE" >> $FOLDER/$LOG_FILE
 		fi
 		;;
   stop)
@@ -148,9 +136,9 @@ case "$1" in
 
   pid)
         if [[ -n $(pgrep raspistill) ]]; then
-                echo "Raspberry Pi Camera Module Fast Capture Daemon is at" `pgrep raspistill`
+                echo `pgrep raspistill`
         else
-                echo "Raspberry Pi Camera Module Fast Capture Daemon is Not Running"
+                echo "0"
         fi
         ;;
 
